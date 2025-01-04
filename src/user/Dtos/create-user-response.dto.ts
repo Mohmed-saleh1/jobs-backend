@@ -35,12 +35,6 @@ export class CreateUserResponseDto {
   location: string;
 
   @ApiProperty({
-    description: 'The number of services offered by the user',
-    example: 3,
-  })
-  noOfServices: number;
-
-  @ApiProperty({
     description: 'The email verification code sent to the user',
     example: 'abc123',
     required: false,

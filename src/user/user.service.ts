@@ -83,4 +83,9 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
   }
+
+  async findUserById(id: number): Promise<UserResponseDto> {
+    const user = await this.userRepo.findOne({ where: { id } });
+    return this.transformUserResponse(user);
+  }
 }

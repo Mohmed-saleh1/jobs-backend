@@ -33,12 +33,6 @@ export class UserResponseDto {
   })
   location: string;
 
-  @ApiProperty({
-    description: 'The number of services offered by the user',
-    example: 3,
-  })
-  noOfServices: number;
-
   isEmailVerified: boolean;
   emailVerifyCode: string;
 }

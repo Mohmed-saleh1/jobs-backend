@@ -1,9 +1,11 @@
+import { Resume } from 'src/resume/entities/resume.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity('user')
@@ -26,9 +28,10 @@ export class User {
   @Column()
   location: string;
 
-  @Column({ default: 0 })
-  noOfServices: number;
+  @OneToMany(() => Resume, (res) => res.user)
+  resumes: Resume[];
 
+  // auth fields
   @Column({ nullable: true })
   emailVerifyCode: string;
 
