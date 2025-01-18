@@ -1,5 +1,7 @@
 import { Role } from 'src/common/types/user.types';
 import { Job } from 'src/job/job.entity';
+import { Education } from 'src/resume/entities/education.entity';
+import { Experience } from 'src/resume/entities/experience.entity';
 import { Resume } from 'src/resume/entities/resume.entity';
 import {
   Entity,
@@ -10,7 +12,7 @@ import {
   OneToMany,
 } from 'typeorm';
 
-@Entity('user')
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -35,6 +37,12 @@ export class User {
 
   @OneToMany(() => Job, (job) => job.owner)
   jobs: Job[];
+
+  @OneToMany(() => Education, (education) => education.owner)
+  educations: Education[];
+
+  @OneToMany(() => Experience, (experience) => experience.owner)
+  experiences: Experience[];
 
   @Column({ nullable: false, default: Role.USER })
   role: Role;

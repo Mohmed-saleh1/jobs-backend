@@ -5,10 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Job } from './job.entity';
 import { User } from 'src/user/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { UserService } from 'src/user/user.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Job, User])],
   controllers: [JobController],
-  providers: [JobService, JwtService],
+  providers: [JobService, JwtService, UserService],
 })
 export class JobModule {}

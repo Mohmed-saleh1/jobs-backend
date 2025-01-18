@@ -25,34 +25,71 @@ export class ResumeService {
   async create(
     createResumeDto: CreateResumeDto,
     userId: number,
-    files: Record<string, Express.Multer.File[]>,
+    userName: string,
+    files: {
+      image?: Express.Multer.File[];
+      resumeFile?: Express.Multer.File[];
+      resumeOriginalFile?: Express.Multer.File[];
+      coverPhotos?: Express.Multer.File[];
+      images?: Express.Multer.File[];
+    },
   ): Promise<Resume> {
-    // Handle file uploads for uploadable fields
-    const uploadableFields = [
-      'image',
-      'resumeFile',
-      'resumeOriginalFile',
-      'coverPhotos',
-      'images',
-    ];
-    const uploadDirectory = 'uploads/resumes';
+    // Create the user folder if it doesn't exist
+    const userFolderPath = this.fileUploadService.createUserFolder(
+      userId,
+      userName,
+    );
 
-    uploadableFields.forEach((field) => {
+    // Generate a unique folder name for the application
+    const applicationFolderName =
+      this.fileUploadService.generateApplicationFolderName();
+    const applicationFolderPath =
+      this.fileUploadService.createApplicationFolder(
+        userFolderPath,
+        applicationFolderName,
+      );
+
+    // Define the uploadable fields
+    const uploadableFields = [
+      { field: 'image', isArray: false },
+      { field: 'resumeFile', isArray: false },
+      { field: 'resumeOriginalFile', isArray: false },
+      { field: 'coverPhotos', isArray: true },
+      { field: 'images', isArray: true },
+    ];
+
+    // Process each uploadable field
+    uploadableFields.forEach(({ field, isArray }) => {
       if (files[field]) {
-        const uploadedFiles = files[field].map((file) =>
-          this.fileUploadService.getFilePath(uploadDirectory, file.filename),
-        );
-        createResumeDto[field] = Array.isArray(createResumeDto[field])
-          ? uploadedFiles
-          : uploadedFiles[0];
+        const filePaths = files[field].map((file) => {
+          // Validate file type and size
+          this.fileUploadService.validateFileType(file, [
+            'image/jpeg',
+            'image/png',
+            'application/pdf',
+          ]);
+          this.fileUploadService.validateFileSize(file, 5 * 1024 * 1024); // 5 MB
+
+          // Move the file to the application folder
+          const filePath = this.fileUploadService.moveFileToFolder(
+            file,
+            applicationFolderPath,
+          );
+
+          return filePath;
+        });
+
+        // Update the DTO with the file paths
+        createResumeDto[field] = isArray ? filePaths : filePaths[0];
       }
     });
 
+    // Create and save the resume
     const user = await this.userService.findUserById(userId);
-
     const resume = this.resumeRepository.create(createResumeDto);
     resume.owner = user;
     await this.resumeRepository.save(resume);
+
     return resume;
   }
 

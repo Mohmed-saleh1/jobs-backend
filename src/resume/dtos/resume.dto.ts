@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   ChildrenType,
+  GenderType,
   LanguageProficiency,
 } from 'src/common/types/resume.type';
 import { Education } from '../entities/education.entity';
@@ -21,9 +22,9 @@ export class ResumeDto {
 
   @ApiProperty({
     description: 'Gender of the applicant',
-    enum: ['male', 'female'],
+    enum: GenderType,
   })
-  gender: 'male' | 'female';
+  gender: GenderType;
 
   @ApiProperty({ description: 'Date of birth of the applicant' })
   birthDate: Date;

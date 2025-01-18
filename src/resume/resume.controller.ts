@@ -14,36 +14,53 @@ import {
 import { ResumeService } from './resume.service';
 import { CreateResumeDto } from './dtos/create-resume.dto';
 import { UpdateResumeDto } from './dtos/update-resume.dto';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
-import { AuthenticationRequest } from 'src/auth/auth.types';
+import { ApiTags, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { FileUploadService } from 'src/common/file-upload/file-upload.service';
-import { FilesInterceptor } from '@nestjs/platform-express';
-
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { User } from 'src/user/user.entity';
+import { multerOptions } from 'src/common/config/multer.config';
 @ApiTags('Resumes')
 @Controller('resumes')
 export class ResumeController {
   constructor(private readonly resumeService: ResumeService) {}
 
   @Post()
+  @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
-    FilesInterceptor('files', 10, {
-      storage: new FileUploadService().getStorage('uploads/resumes'),
-    }),
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 1 },
+        { name: 'resumeFile', maxCount: 1 },
+        { name: 'resumeOriginalFile', maxCount: 1 },
+        { name: 'coverPhotos', maxCount: 10 },
+        { name: 'images', maxCount: 10 },
+      ],
+      multerOptions,
+    ),
   )
+  @ApiBody({
+    description: 'Create a new resume',
+    type: CreateResumeDto,
+  })
   async create(
+    @UploadedFiles()
+    files: {
+      image?: Express.Multer.File[];
+      resumeFile?: Express.Multer.File[];
+      resumeOriginalFile?: Express.Multer.File[];
+      coverPhotos?: Express.Multer.File[];
+      images?: Express.Multer.File[];
+    },
     @Body() createResumeDto: CreateResumeDto,
-    @Req() req: AuthenticationRequest,
-    @UploadedFiles() files: Express.Multer.File[],
+    @Req() req: Request & { user: User },
   ) {
-    const filesMap = {};
-    files.forEach((file) => {
-      if (!filesMap[file.fieldname]) filesMap[file.fieldname] = [];
-      filesMap[file.fieldname].push(file);
-    });
+    // Extract user information from the request
 
-    return this.resumeService.create(createResumeDto, req.user.id, filesMap);
+    const userId = req.user.id;
+    const userName = req.user.name;
+    // Call the service to create the resume
+    return this.resumeService.create(createResumeDto, userId, userName, files);
   }
 
   @Get()

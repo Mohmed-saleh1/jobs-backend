@@ -10,11 +10,10 @@ import {
 } from 'class-validator';
 import {
   ChildrenType,
+  GenderType,
   LanguageProficiency,
+  RelationType,
 } from 'src/common/types/resume.type';
-import { Experience } from '../entities/experience.entity';
-import { Education } from '../entities/education.entity';
-import { RelationType } from 'typeorm/metadata/types/RelationTypes';
 
 export class CreateResumeDto {
   @ApiProperty({ description: 'Full name of the applicant' })
@@ -31,22 +30,28 @@ export class CreateResumeDto {
 
   @ApiProperty({
     description: 'Gender of the applicant',
-    enum: ['male', 'female'],
+    enum: GenderType,
   })
-  @IsEnum(['male', 'female'])
-  gender: 'male' | 'female';
+  @IsEnum(GenderType)
+  gender: GenderType;
 
   @ApiProperty({ description: 'Date of birth of the applicant' })
   @IsDate()
   birthDate: Date;
 
-  @ApiProperty({ description: 'Relationship status of the applicant' })
-  @IsString()
+  @ApiProperty({
+    description: 'Relationship status of the applicant',
+    enum: RelationType,
+  })
+  @IsEnum(RelationType)
   relationShip: RelationType;
 
-  @ApiPropertyOptional({ description: 'Children details, if applicable' })
+  @ApiPropertyOptional({
+    description: 'Children details, if applicable',
+    enum: ChildrenType,
+  })
   @IsOptional()
-  @IsString()
+  @IsEnum(ChildrenType)
   children?: ChildrenType;
 
   @ApiProperty({ description: 'Height of the applicant in cm' })
@@ -61,15 +66,22 @@ export class CreateResumeDto {
   @IsString()
   location: string;
 
-  @ApiPropertyOptional({ description: 'Profile image of the applicant' })
+  @ApiPropertyOptional({
+    description: 'Profile image of the applicant',
+    type: 'string',
+    format: 'binary',
+  })
   @IsOptional()
-  @IsString()
-  image?: string;
+  image?: any;
 
-  @ApiProperty({ description: 'Array of additional images', type: [String] })
+  @ApiPropertyOptional({
+    description: 'Array of additional images',
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+  })
+  @IsOptional()
   @IsArray()
-  @IsString({ each: true })
-  images: string[];
+  images?: any[];
 
   @ApiProperty({ description: 'Job category of the applicant' })
   @IsString()
@@ -107,10 +119,14 @@ export class CreateResumeDto {
   @IsString()
   educationLevel: string;
 
-  @ApiProperty({ description: 'Cover photos for the resume', type: [String] })
+  @ApiPropertyOptional({
+    description: 'Cover photos for the resume',
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+  })
+  @IsOptional()
   @IsArray()
-  @IsString({ each: true })
-  coverPhotos: string[];
+  coverPhotos?: any[];
 
   @ApiProperty({
     description: 'English language proficiency level',
@@ -150,31 +166,19 @@ export class CreateResumeDto {
   @IsEnum(LanguageProficiency)
   spanishLevel?: LanguageProficiency;
 
-  @ApiPropertyOptional({ description: 'Resume file path' })
-  @IsOptional()
-  @IsString()
-  resumeFile?: string;
-
-  @ApiPropertyOptional({ description: 'Original resume file path' })
-  @IsOptional()
-  @IsString()
-  resumeOriginalFile?: string;
-
   @ApiPropertyOptional({
-    description: 'Education IDs linked to the resume',
-    type: [String],
+    description: 'Resume file path',
+    type: 'string',
+    format: 'binary',
   })
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  education?: Education[];
+  resumeFile?: any;
 
   @ApiPropertyOptional({
-    description: 'Experience IDs linked to the resume',
-    type: [String],
+    description: 'Original resume file path',
+    type: 'string',
+    format: 'binary',
   })
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  experiences?: Experience[];
+  resumeOriginalFile?: any;
 }

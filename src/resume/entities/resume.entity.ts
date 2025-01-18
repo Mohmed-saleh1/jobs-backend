@@ -11,9 +11,10 @@ import { Education } from './education.entity';
 import {
   ChildrenType,
   LanguageProficiency,
+  RelationType,
+  GenderType,
 } from 'src/common/types/resume.type';
 import { Experience } from './experience.entity';
-import { RelationType } from 'typeorm/metadata/types/RelationTypes';
 import { User } from 'src/user/user.entity';
 
 @Entity('resumies')
@@ -31,7 +32,7 @@ export class Resume {
   phone: string;
 
   @Column()
-  gender: 'male' | 'female';
+  gender: GenderType;
 
   @Column()
   birthDate: Date;

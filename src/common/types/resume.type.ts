@@ -19,3 +19,8 @@ export enum ChildrenType {
   Yes = 'yes',
   Pregnant = 'pregnant',
 }
+
+export enum GenderType {
+  Male = 'male',
+  Female = 'female',
+}

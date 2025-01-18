@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Resume } from './resume.entity';
+import { User } from 'src/user/user.entity';
 
 @Entity('experience')
 export class Experience {
@@ -20,6 +21,9 @@ export class Experience {
 
   @Column()
   notes: string;
+
+  @ManyToOne(() => User, (user) => user.experiences)
+  owner: Partial<User>;
 
   @ManyToOne(() => Resume, (res) => res.experiences)
   resume: Resume;
