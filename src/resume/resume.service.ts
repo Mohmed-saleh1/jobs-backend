@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateResumeDto } from './dtos/create-resume.dto';
-import { UpdateResumeDto } from './dtos/update-resume.dto';
 import { Resume } from './entities/resume.entity';
 import { Education } from './entities/education.entity';
 import { Experience } from './entities/experience.entity';
@@ -109,12 +108,6 @@ export class ResumeService {
       throw new NotFoundException(`Resume with ID ${id} not found`);
     }
     return resume;
-  }
-
-  async update(id: number, updateResumeDto: UpdateResumeDto): Promise<Resume> {
-    const resume = await this.findOne(id);
-    Object.assign(resume, updateResumeDto);
-    return this.resumeRepository.save(resume);
   }
 
   async remove(id: number): Promise<void> {

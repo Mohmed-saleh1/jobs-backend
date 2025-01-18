@@ -15,6 +15,13 @@ export class FileUploadService {
     return `application-${Date.now()}`;
   }
 
+  getApplicationFolderPath(
+    userFolderPath: string,
+    applicationFolderName: string,
+  ): string {
+    return path.join(userFolderPath, applicationFolderName);
+  }
+
   /**
    * Creates a folder for a user if it doesn't exist.
    * @param userId - The ID of the user.

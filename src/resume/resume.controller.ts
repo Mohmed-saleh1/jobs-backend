@@ -4,7 +4,6 @@ import {
   Post,
   Param,
   Body,
-  Patch,
   Delete,
   Req,
   UseGuards,
@@ -13,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { ResumeService } from './resume.service';
 import { CreateResumeDto } from './dtos/create-resume.dto';
-import { UpdateResumeDto } from './dtos/update-resume.dto';
 import { ApiTags, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -77,16 +75,6 @@ export class ResumeController {
   @ApiResponse({ status: 404, description: 'Resume not found.' })
   findOne(@Param('id') id: string) {
     return this.resumeService.findOne(+id);
-  }
-
-  @Patch(':id')
-  @ApiResponse({
-    status: 200,
-    description: 'The resume has been updated successfully.',
-  })
-  @ApiResponse({ status: 404, description: 'Resume not found.' })
-  update(@Param('id') id: string, @Body() updateResumeDto: UpdateResumeDto) {
-    return this.resumeService.update(+id, updateResumeDto);
   }
 
   @Delete(':id')
