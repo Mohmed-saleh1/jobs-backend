@@ -8,10 +8,11 @@ import { Experience } from './entities/experience.entity';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { FileUploadService } from 'src/common/file-upload/file-upload.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Resume, Education, Experience, User])],
   controllers: [ResumeController],
-  providers: [ResumeService, UserService, JwtService],
+  providers: [ResumeService, UserService, JwtService, FileUploadService],
 })
 export class ResumeModule {}

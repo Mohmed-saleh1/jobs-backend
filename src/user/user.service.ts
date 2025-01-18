@@ -52,6 +52,11 @@ export class UserService {
     return user;
   }
 
+  async findUserByIDForAuth(id: number): Promise<User> {
+    const user = await this.userRepo.findOne({ where: { id } });
+    return user;
+  }
+
   async findAllUsers(): Promise<UserResponseDto[]> {
     const users = await this.userRepo.find();
     return this.transformUsersResponse(users);

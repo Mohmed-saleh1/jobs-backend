@@ -7,6 +7,7 @@ import { Resume } from './entities/resume.entity';
 import { Education } from './entities/education.entity';
 import { Experience } from './entities/experience.entity';
 import { UserService } from 'src/user/user.service';
+import { FileUploadService } from 'src/common/file-upload/file-upload.service';
 
 @Injectable()
 export class ResumeService {
@@ -18,15 +19,39 @@ export class ResumeService {
     @InjectRepository(Experience)
     private readonly experienceRepository: Repository<Experience>,
     private readonly userService: UserService,
+    private readonly fileUploadService: FileUploadService,
   ) {}
 
   async create(
     createResumeDto: CreateResumeDto,
     userId: number,
+    files: Record<string, Express.Multer.File[]>,
   ): Promise<Resume> {
+    // Handle file uploads for uploadable fields
+    const uploadableFields = [
+      'image',
+      'resumeFile',
+      'resumeOriginalFile',
+      'coverPhotos',
+      'images',
+    ];
+    const uploadDirectory = 'uploads/resumes';
+
+    uploadableFields.forEach((field) => {
+      if (files[field]) {
+        const uploadedFiles = files[field].map((file) =>
+          this.fileUploadService.getFilePath(uploadDirectory, file.filename),
+        );
+        createResumeDto[field] = Array.isArray(createResumeDto[field])
+          ? uploadedFiles
+          : uploadedFiles[0];
+      }
+    });
+
     const user = await this.userService.findUserById(userId);
+
     const resume = this.resumeRepository.create(createResumeDto);
-    resume.user = user;
+    resume.owner = user;
     await this.resumeRepository.save(resume);
     return resume;
   }
@@ -65,7 +90,7 @@ export class ResumeService {
   async findResumesByUserId(id: number): Promise<Resume[]> {
     return this.resumeRepository.find({
       where: {
-        user: {
+        owner: {
           id,
         },
       },

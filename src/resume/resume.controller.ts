@@ -8,6 +8,8 @@ import {
   Delete,
   Req,
   UseGuards,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { ResumeService } from './resume.service';
 import { CreateResumeDto } from './dtos/create-resume.dto';
@@ -15,6 +17,8 @@ import { UpdateResumeDto } from './dtos/update-resume.dto';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { AuthenticationRequest } from 'src/auth/auth.types';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { FileUploadService } from 'src/common/file-upload/file-upload.service';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Resumes')
 @Controller('resumes')
@@ -23,16 +27,23 @@ export class ResumeController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @ApiResponse({
-    status: 201,
-    description: 'The resume has been created successfully.',
-  })
-  @ApiResponse({ status: 400, description: 'Bad Request.' })
-  create(
+  @UseInterceptors(
+    FilesInterceptor('files', 10, {
+      storage: new FileUploadService().getStorage('uploads/resumes'),
+    }),
+  )
+  async create(
     @Body() createResumeDto: CreateResumeDto,
     @Req() req: AuthenticationRequest,
+    @UploadedFiles() files: Express.Multer.File[],
   ) {
-    return this.resumeService.create(createResumeDto, req.user.id);
+    const filesMap = {};
+    files.forEach((file) => {
+      if (!filesMap[file.fieldname]) filesMap[file.fieldname] = [];
+      filesMap[file.fieldname].push(file);
+    });
+
+    return this.resumeService.create(createResumeDto, req.user.id, filesMap);
   }
 
   @Get()

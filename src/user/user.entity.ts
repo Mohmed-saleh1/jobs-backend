@@ -1,3 +1,5 @@
+import { Role } from 'src/common/types/user.types';
+import { Job } from 'src/job/job.entity';
 import { Resume } from 'src/resume/entities/resume.entity';
 import {
   Entity,
@@ -28,10 +30,15 @@ export class User {
   @Column()
   location: string;
 
-  @OneToMany(() => Resume, (res) => res.user)
+  @OneToMany(() => Resume, (res) => res.owner)
   resumes: Resume[];
 
-  // auth fields
+  @OneToMany(() => Job, (job) => job.owner)
+  jobs: Job[];
+
+  @Column({ nullable: false, default: Role.USER })
+  role: Role;
+
   @Column({ nullable: true })
   emailVerifyCode: string;
 

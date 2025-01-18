@@ -52,10 +52,10 @@ export class Resume {
   location: string;
 
   @Column()
-  image: string;
+  image?: string;
 
   // @Column()
-  images: string[];
+  images?: string[];
 
   @Column()
   category: string;
@@ -97,16 +97,16 @@ export class Resume {
   spanishLevel: LanguageProficiency;
 
   @OneToMany(() => Experience, (exp) => exp.resume)
-  experiences: Experience[];
+  experiences?: Experience[];
 
   @Column()
-  resumeFile: string;
+  resumeFile?: string;
 
   @Column()
-  resumeOriginalFile: string;
+  resumeOriginalFile?: string;
 
   // @Column()
-  coverPhotos: string[];
+  coverPhotos?: string[];
 
   @CreateDateColumn()
   createdAt: Date;
@@ -115,5 +115,5 @@ export class Resume {
   updatedAt: Date;
 
   @ManyToOne(() => User, (user) => user.resumes)
-  user: Partial<User>;
+  owner: Partial<User>;
 }
